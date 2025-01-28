@@ -1,3 +1,4 @@
+#Requires -RunAsAdministrator
 <#
     .DISCLAIMER
 
@@ -9,10 +10,15 @@
     .DESCRIPTION
     Configure scheduled job to execute the Backup-Dhcp-Server script.
 
-    .PARAMETER Path 
+    .PARAMETER BackupPath 
     Specifies where the backup file will be created.
-    This can be a local path or a UNC path, but the user running the script must have write permissions to the path.
+    This can be a local path or a UNC path
+    - The user running the script must have write permissions to the path.
+    - The DHCP Server account in AD needs write permissions to the path.
     
+    .PARAMETER ScriptPath 
+    Specifies where the required scripts will be downloaded to and executed from.
+
     .EXAMPLE
     .\Add-BackupSchedule.ps1 -BackupPath "\\FileServer\Backup\DHCP" -ScriptPath "C:\LocalScripts"
 
@@ -20,35 +26,41 @@
 
 [CmdletBinding()]
 Param(
-  [Parameter(ValueFromPipelineByPropertyName=$true,Position=0)][string]$BackupPath,
-  [Parameter(ValueFromPipelineByPropertyName=$true,Position=0)][string]$ScriptPath
-
+  [Parameter(ValueFromPipelineByPropertyName=$true,Position=0,mandatory=$true)]
+  [ValidatePattern("^\\\\\S+$")]
+  [string]$BackupPath,
+  [Parameter(ValueFromPipelineByPropertyName=$true,Position=0,mandatory=$true)]
+  [ValidatePattern("^\w:\\\S+$")]
+  [string]$ScriptPath
 )
+
 
 
 # Verify Script location
 # ------------------------------------------------------------
-if ($null -eq $ScriptPath) {
-    Throw "Missing Script path"
-} else {
-    if (!(Test-Path -Path $ScriptPath)) {
-        New-Item -Path $ScriptPath -ItemType Directory | Out-Null
-    }
+if (!(Test-Path -Path $ScriptPath)) {
+    New-Item -Path $ScriptPath -ItemType Directory | Out-Null
 }
 
 
 # Verify Backup location
 # ------------------------------------------------------------
-if ($null -eq $BackupPath) {
-    Throw "Missing backup path"
+# Verify Backup location
+# ------------------------------------------------------------
+if (!(Test-Path -Path $BackupPath)) {
+    Throw "Backup Path not found"
 } else {
-    if (!(Test-Path -Path $BackupPath)) {
-        Throw "Backup Path not found"
+    $AllowedPermissions = @("FullControl","Modify","Write")
+
+    $ACL = Get-ACL -Path $BackupPath
+    $ACLAccess = $ACL.Access | Where { $_.IdentityReference -eq "$($ENV:UserDomain)\$($env:COMPUTERNAME)$" }
+    if ($AllowedPermissions -NotContains $(($ACLAccess.FileSystemRights -split(","))[0])) {
+        Throw "Missing permissions on Network Share"
     }
 }
 
 
-# Create Backup Script
+# Download DHCP Scripts
 # ------------------------------------------------------------
 $GitUrl = "https://raw.githubusercontent.com/SysAdminDk/Powershell/main/DHCP"
 if (!(Test-Path -Path "$ScriptPath\Backup-Dhcp-Server.ps1")) {
@@ -57,9 +69,6 @@ if (!(Test-Path -Path "$ScriptPath\Backup-Dhcp-Server.ps1")) {
 if (!(Test-Path -Path "$ScriptPath\Restore-Dhcp-Server.ps1")) {
     Invoke-WebRequest -Uri "$GitUrl/Restore-Dhcp-Server.ps1" -OutFile "$ScriptPath\Restore-Dhcp-Server.ps1"
 }
-#if (!(Test-Path -Path "$ScriptPath\Setup-Dhcp-Server.ps1")) {
-#    Invoke-WebRequest -Uri "$GitUrl/Setup-Dhcp-Server.ps1" -OutFile "$ScriptPath\Setup-Dhcp-Server.ps1"
-#}
 
 
 # Create Backup Schedule

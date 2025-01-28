@@ -19,22 +19,18 @@
 #>
 [CmdletBinding()]
 Param(
-  [Parameter(ValueFromPipelineByPropertyName=$true,Position=0)][string]$Path
+  [Parameter(ValueFromPipelineByPropertyName=$true,Position=0,mandatory=$true)]
+  [ValidatePattern("^\\\\\S+$")]
+  [string]$BackupPath
 )
 
-#
-# Create the folder if missing.
-#
-if (!(Test-Path -Path $Path)) {
-    New-Item -Path $Path -ItemType Directory -Force | Out-Null
-}
 
 #
 # Backup DHCP server
 #
 Try {
     $FileName = (get-date).ToString('dd-MM-yyyy')
-    Export-DhcpServer -Leases -File "$Path\DHCP-$FileName.xml"
+    Export-DhcpServer -Leases -File "$BackupPath\DHCP-$FileName.xml"
 } Catch {
     Write-Output "Unable to backup DHCP server"
     Write-Output $_

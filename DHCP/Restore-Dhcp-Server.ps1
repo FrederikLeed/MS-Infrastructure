@@ -1,3 +1,4 @@
+#Requires -RunAsAdministrator
 <#
     .DISCLAIMER
 
@@ -16,15 +17,25 @@
     .EXAMPLE
     .\Restore-Dhcp-Server.ps1 -Path "\\FILE01\Backup\DHCP"
 #>
+
 [CmdletBinding()]
 Param(
-  [Parameter(ValueFromPipelineByPropertyName=$true,Position=0)][string]$Path
+  [Parameter(ValueFromPipelineByPropertyName=$true,Position=0,mandatory=$true)]
+  [ValidatePattern("^\\\\\S+$")]
+  [string]$BackupPath
 )
 
-# --------------------------------------------------------------------------------------------------
+
+# Find latest backup file
+# ------------------------------------------------------------
+$LatestBackup = Get-ChildItem -Path $BackupPath | Sort-Object CreationTime -Descending | Select-Object -First 1
+if ($null -eq $LatestBackup) {
+    Throw "Unable to locate any DHCP backup files in the path provided"
+}
+
+
 # Restore the DHCP server
-# --------------------------------------------------------------------------------------------------
-$LatestBackup = Get-ChildItem -Path $Path | Sort-Object CreationTime -Descending | Select-Object -First 1
+# ------------------------------------------------------------
 Try {
     Import-DhcpServer -Leases -File "$($LatestBackup.fullname)" -BackupPath "C:\Windows\Temp" -force
 } catch {
