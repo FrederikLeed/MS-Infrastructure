@@ -8,20 +8,22 @@ There is still the manual task of updating / changing the IP Helper(s) on networ
 
 
 ### Scripts in this directory.    
-#### Setup-Dhcp-Server.ps1  
-To install and configure a standalone DHCP server, the script will also import the latest backup and authorize the DHCP server in Active Directory.
+#### Install-DHCP-Server.ps1
+Install and Authorize DHCP Services on new Windows Server.
 
-#### Backup-Dhcp-Server.ps1  
-Backup DHCP Scopes and Leases to an XML backup on the UNC path provided.
-
-#### Restore-Dhcp-Server.ps1  
+#### Restore-DHCP-Sopes.ps1  
 Restore DHCP Scopes and Leases from latest XML backup on the UNC path provided.
 
+#### Restore-DHCP-Server.ps1  
+Install, Authorize and Restore DHCP Services on new Windows Server.
+Execute, Install-DHCP-Server and Restore-DHCP-Scopes.
 
-#### Add-BackupSchedule.ps1  
+#### Add-DHCP-BackupSchedule.ps1  
 Creates a Scheduled Task that executes the backup script as local system.
 This requires Write permissions the UNC path for the DHCP servers AD Account. (DHCP-01$)
 
+#### Backup-DHCP-Sopes.ps1  
+Backup DHCP Scopes and Leases to an XML backup on the UNC path provided.
 
 #### Add-DHCP-Failower.ps1  
 To add additional DHCP server to the scopes if high availability is required.
