@@ -8,14 +8,16 @@
     all responsibility for any failures, damages, or issues that may arise as a result of executing this script.
 
     .DESCRIPTION
-    Restore the DHCP server with leases, to the latest backup file found on the supplied Path
+    Restore DHCP Scopes and Leases, to the latest backup file found on the supplied Path
+
 
     .PARAMETER Path 
     Specifies where the backup file will be retrieved.
     This can be a local path or a UNC path.
     
     .EXAMPLE
-    .\Restore-Dhcp-Server.ps1 -Path "\\FILE01\Backup\DHCP"
+    .\Restore-DHCP-Scopes.ps1 -BackupPath "\\FileServer\Backup\DHCP"
+
 #>
 
 [CmdletBinding()]

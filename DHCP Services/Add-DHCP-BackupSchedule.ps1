@@ -45,8 +45,6 @@ if (!(Test-Path -Path $ScriptPath)) {
 
 # Verify Backup location
 # ------------------------------------------------------------
-# Verify Backup location
-# ------------------------------------------------------------
 if (!(Test-Path -Path $BackupPath)) {
     Throw "Backup Path not found"
 } else {
@@ -63,11 +61,12 @@ if (!(Test-Path -Path $BackupPath)) {
 # Download DHCP Scripts
 # ------------------------------------------------------------
 $GitUrl = "https://raw.githubusercontent.com/SysAdminDk/Powershell/main/DHCP"
-if (!(Test-Path -Path "$ScriptPath\Backup-Dhcp-Server.ps1")) {
-    Invoke-WebRequest -Uri "$GitUrl/Backup-Dhcp-Server.ps1" -OutFile "$ScriptPath\Backup-Dhcp-Server.ps1"
-}
-if (!(Test-Path -Path "$ScriptPath\Restore-Dhcp-Server.ps1")) {
-    Invoke-WebRequest -Uri "$GitUrl/Restore-Dhcp-Server.ps1" -OutFile "$ScriptPath\Restore-Dhcp-Server.ps1"
+$Files = @("Backup-DHCP-Sopes.ps1","Restore-DHCP-Sopes.ps1","Add-DHCP-BackupSchedule.ps1","Install-DHCP-Server.ps1","Add-DHCP-Failover.ps1","Restore-DHCP-Server.ps1")
+
+$Files | Foreach {
+    if (!(Test-Path -Path "$ScriptPath\$($_)")) {
+        Invoke-WebRequest -Uri "$GitUrl/$($_)" -OutFile "$ScriptPath\$($_)"
+    }
 }
 
 
@@ -75,7 +74,7 @@ if (!(Test-Path -Path "$ScriptPath\Restore-Dhcp-Server.ps1")) {
 # ------------------------------------------------------------
 $Scheduletrigger = New-ScheduledTaskTrigger -Daily -At "23:00"
 $ScheduleSettings = New-ScheduledTaskSettingsSet -Compatibility Win8
-$ScheduleAction = New-ScheduledTaskAction -Execute "Powershell.exe" -Argument "-ExecutionPolicy Bypass -File `"$ScriptPath\Backup-Dhcp-Server.ps1`" -path $BackupPath"
+$ScheduleAction = New-ScheduledTaskAction -Execute "Powershell.exe" -Argument "-ExecutionPolicy Bypass -File `"$ScriptPath\Backup-DHCP-Sopes.ps1`" -BackupPath $BackupPath"
 $SchedulePrincipal = New-ScheduledTaskPrincipal -UserID "NT AUTHORITY\SYSTEM" -LogonType ServiceAccount -RunLevel Limited
 $ScheduledTask = New-ScheduledTask -Action $ScheduleAction -Trigger $Scheduletrigger -Settings $ScheduleSettings -Principal $SchedulePrincipal
 Register-ScheduledTask -TaskName "Backup DHCP service - Daily" -InputObject $ScheduledTask
