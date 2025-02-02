@@ -1,2 +1,2 @@
 # Infrastructure-Hardening
-Scripts and tools used to harden on-prem infrastructure.
+Scripts and tools I use to manage and assist in securing an on-premise infrastructure.
