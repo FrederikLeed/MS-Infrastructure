@@ -1,12 +1,11 @@
-## DHCP Server tools.
+## DHCP Services Scripts.
 
 Unfortunately, I meet customers where the DHCP service have been installed on one or more of the Domain Controllers  
 I have created this collection of scripts that can assist with the migration of the DHCP role away from the Domain Controller(s)
 
 There is still the manual task of updating / changing the IP Helper(s) on network equipment!
-
-
-
+  
+  
 ### Scripts in this directory.    
 #### Install-DHCP-Server.ps1
 Install and Authorize DHCP Services on new Windows Server.
