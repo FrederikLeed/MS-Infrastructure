@@ -1,21 +1,25 @@
 ﻿<#
     
-    Finding : At least one administrator account can be delegated
-    - The purpose is to ensure that all Administrator Accounts have the configuration flag "this account is sensitive and cannot be delegated"
+    Finding : Check if all privileged accounts are in "Protected Users"
+    - Disables NTLM authentication
+    - Reduces Kerberos ticket lifetime
+    - Mandates strong encryption algorithms, such as AES
+    - Prevents password caching on workstations
+    - Prevents any type of Kerberos delegation
 
 #>
 
-# Find all members of Domain Admins and ensures that the flag is set.
+# Find all members of Domain Admins and .....
 # --------------------------------------------------
-$PriviligeGroups = ("Administrators", "Domain Admins", "Enterprise Admins", "Schema Admins", "DnsAdmins", "Group Policy Creator Owners")
-$AdminUsers = $PriviligeGroups | Foreach { Get-ADGroupMember $($_) } | Where { $_.ObjectClass -Eq "User" } | Select-Object -Unique
-$AdminUsers = $AdminUsers | Get-ADUser -Properties AccountNotDelegated | Where-Object { -not $_.AccountNotDelegated }
+$PriviligeGroups = @("Administrators", "Domain Admins", "Enterprise Admins", "Schema Admins")
+$ProtectedUsersGroup = (Get-ADGroup -Filter { Name -eq "Protected Users" }).DistinguishedName
 
-$SelectedUsers = $AdminUsers | Select-Object Name, UserPrincipalName, DistinguishedName | `
-    Out-GridView -Title "Select the admins that isnt uses as service accounts" -OutputMode Multiple
+$SelectedUsers = $PriviligeGroups | Get-ADGroupMember -Recursive | Get-ADUser -Properties MemberOf | Select-Object -Unique | `
+    Where-Object { $_.Name -notIn $BreakGlassAccountNames -and $_.objectClass -eq "user" -and $_.MemberOf -notcontains $ProtectedUsersGroup } | `
+        Select-Object Name, UserPrincipalName, DistinguishedName | Out-GridView -Title "Select the admins that are NOT used as service accounts" -OutputMode Multiple
 
-if ($SelectedUsers) {
+if ($Null -ne $SelectedUsers) {
 
-    $AdminUsers.DistinguishedName | Set-ADUser -AccountNotDelegated $true
+    Add-ADGroupMember -Identity "Protected Users" -Members $SelectedUsers.DistinguishedName
 
 }

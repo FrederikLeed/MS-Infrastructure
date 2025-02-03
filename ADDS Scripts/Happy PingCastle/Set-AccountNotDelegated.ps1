@@ -8,14 +8,15 @@
 # Find all members of Domain Admins and ensures that the flag is set.
 # --------------------------------------------------
 $PriviligeGroups = @("Administrators", "Domain Admins", "Enterprise Admins", "Schema Admins", "DnsAdmins", "Group Policy Creator Owners")
-$AdminUsers = $PriviligeGroups | Foreach { Get-ADGroupMember $($_) } | Where { $_.ObjectClass -Eq "User" } | Select-Object -Unique
+
+$AdminUsers = $PriviligeGroups | Get-ADGroupMember -Recursive | Select-Object -Unique | Get-ADUser
 $AdminUsers = $AdminUsers | Get-ADUser -Properties AccountNotDelegated | Where-Object { -not $_.AccountNotDelegated }
 
-$SelectedUsers = $AdminUsers | Select-Object Name, UserPrincipalName, DistinguishedName | `
-    Out-GridView -Title "Select the admins that isnt uses as service accounts" -OutputMode Multiple
+$SelectedUsers = $AdminUsers | Select-Object Name, SamAccountName, UserPrincipalName, DistinguishedName | `
+    Out-GridView -Title "Select the admins that are NOT used as service accounts" -OutputMode Multiple
 
-if ($SelectedUsers) {
+if ($Null -ne $SelectedUsers) {
 
-    $AdminUsers.DistinguishedName | Set-ADUser -AccountNotDelegated $true
+    $SelectedUsers.DistinguishedName | Set-ADUser -AccountNotDelegated $true
 
 }
