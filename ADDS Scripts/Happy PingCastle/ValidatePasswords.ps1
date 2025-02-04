@@ -13,7 +13,16 @@
 
 #>
 
+# Set PDC as deault server
+# ------------------------------------------------------------
+$PSDefaultParameterValues = @{
+    "*AD*:Server" = $(Get-ADDomain).PDCEmulator
+}
+
+
+# ------------------------------------------------------------
 $DomainAdmins = Get-ADGroupMember "Domain Admins"
+$PriviligeGroups = @("Administrators", "Domain Admins", "Enterprise Admins", "Schema Admins")
 
 
 # Validate that Domain Admins have updated the password.

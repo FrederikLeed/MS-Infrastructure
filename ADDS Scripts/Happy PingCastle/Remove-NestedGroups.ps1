@@ -1,15 +1,49 @@
-# --------------------------------------------------
-# List and remove Groups that are member of Domain Admin
-#
-# - To ensure transparency, dont use nested groups in the Builtin groups.
-#
-# --------------------------------------------------
-$ClearGroups = Get-ADGroupMember -Identity "Domain Admins" | Where-Object {
-    $_.objectClass -eq "group"
-} | Select-Object -Property Name,DistinguishedName | Out-GridView -Title "Remove selected groups from Domain Admins" -OutputMode Multiple
+<#
 
-if ($ClearGroups) {
+    List and remove Groups that are member of Domain Admin
+    - To ensure transparency, I recommend NOT to use nested groups in the Builtin groups.
 
-    Remove-ADGroupMember -Identity "Domain Admins" -Members $ClearGroups.DistinguishedName -Confirm:$false
+#>
+
+# Set PDC as deault server
+# ------------------------------------------------------------
+$PSDefaultParameterValues = @{
+    "*AD*:Server" = $(Get-ADDomain).PDCEmulator
+}
+
+
+# ------------------------------------------------------------
+$PriviligeGroups = @("Administrators", "Domain Admins", "Enterprise Admins", "Schema Admins")
+
+
+# Remove Nested Groups from High Privilige Groups.
+# ------------------------------------------------------------
+$AllNedtedGroups = @()
+Foreach ($Group in $PriviligeGroups) {
+    $GroupInfo = Get-ADGroup -Identity $Group
+    $GroupMembers = $(Get-ADGroupMember -Identity $GroupInfo.distinguishedName | Where { $_.objectClass -eq "group" })
+
+    Foreach ($Member in $GroupMembers) {
+
+        If ( ($GroupInfo.Name -eq "Administrators") -and ( ($Member.Name -eq "Domain Admins") -or ($Member.Name -eq "Enterprise Admins") ) ) {
+        } else {
+
+            $NestedGroups = New-Object -TypeName psobject
+            $NestedGroups | Add-Member -MemberType NoteProperty -Name "GroupName" -Value $GroupInfo.Name
+            $NestedGroups | Add-Member -MemberType NoteProperty -Name "GroupNameCN" -Value $GroupInfo.distinguishedName
+            $NestedGroups | Add-Member -MemberType NoteProperty -Name "NestedGroupCN" -Value $Member.distinguishedName
+
+            $AllNedtedGroups += $NestedGroups
+        }
+    }
+}
+
+$SelectedGroups = $AllNedtedGroups | Out-GridView -Title "Select the groups to remove" -OutputMode Multiple
+
+if ($null -ne $SelectedGroups) {
+
+    $SelectedGroups | Foreach {
+        Remove-ADGroupMember -Identity $_.GroupNameCN -Members $_.NestedGroupCN -Confirm:$false
+    }
 
 }

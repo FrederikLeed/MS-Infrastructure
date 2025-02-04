@@ -5,6 +5,13 @@
 
 #>
 
+# Set PDC as deault server
+# ------------------------------------------------------------
+$PSDefaultParameterValues = @{
+    "*AD*:Server" = $(Get-ADDomain).PDCEmulator
+}
+
+
 # Find all members of Domain Admins and ensures that the flag is set.
 # --------------------------------------------------
 $PriviligeGroups = @("Administrators", "Domain Admins", "Enterprise Admins", "Schema Admins", "DnsAdmins", "Group Policy Creator Owners")
