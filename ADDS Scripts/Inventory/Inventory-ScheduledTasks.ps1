@@ -8,21 +8,24 @@
 
 #>
 
-# List all Windows Servers in the domain, excluding Domain Controllers (There shouldn't be any)
-# ----------------------------------------------------------------------------------------------------
-$AllServers = Get-ADComputer -Filter "operatingSystem -like 'Windows Server*'"
-$AllServers = $AllServers | Where {$_.DistinguishedName -notlike "*Domain*"}
+# List all Windows Servers in the domain, excluding Domain Controllers
+# ------------------------------------------------------------
+$PrimaryGroup = "CN=Domain Computers,CN=Users,DC=Prod,DC=SysAdmins,DC=Dk"
+$AllServers = Get-ADComputer -Filter "operatingSystem -like 'Windows Server*' -and PrimaryGroup -eq '$PrimaryGroup'"
 
 
 # Exclude from inventory
-# ----------------------------------------------------------------------------------------------------
+# ------------------------------------------------------------
 $ExcludeAccounts = @($null,"System","Network Service", "local Service")
 
 
+# Run Inventory
+# ------------------------------------------------------------
+$Inventory = @()
 Foreach ($Server in $AllServers) {
 
     # Test connection with WinRM (needed for remote PowerShell)
-    # ----------------------------------------------------------------------------------------------------
+    # ------------------------------------------------------------
     $NetWinRM = Test-NetConnection -ComputerName $Server.DNSHostName -CommonTCPPort WINRM
     If (!($NetWinRM.TcpTestSucceeded)) {
         Write-Warning "Unable to connect to $($Server.DNSHostName)"
@@ -32,7 +35,7 @@ Foreach ($Server in $AllServers) {
         Write-Output "Connect WinRM"
 
         # Connect and get all shcduled tasks
-        # ----------------------------------------------------------------------------------------------------
+        # ------------------------------------------------------------
         Invoke-Command -ComputerName $Server.DNSHostName -Authentication NegotiateWithImplicitCredential -ScriptBlock {
 
             $Command = Get-Command -Name "Get-ScheduledTask" -ErrorAction SilentlyContinue
