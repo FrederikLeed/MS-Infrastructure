@@ -12,3 +12,4 @@ Removes all users that have been disabled with the "Disable-Stale-Users.ps1" aft
 
 #### Remove-Unused-GPOs.ps1
 Find and delete all GPOs that is NOT linked to any OUs or have all settings disabled.
+- Please run the GPO Backup/GPO-Export-and-Backup.ps1 prior to executing this.
