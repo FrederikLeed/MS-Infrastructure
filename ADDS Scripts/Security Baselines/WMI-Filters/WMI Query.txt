@@ -31,3 +31,6 @@ Windows Server 2022 [ALL]; SELECT * FROM Win32_OperatingSystem WHERE (Caption LI
 Windows Server 2022 [MEMBER]; SELECT * FROM Win32_OperatingSystem WHERE (Caption LIKE "%Server 2022%") AND (ProductType = "3")
 Windows Server 2016 or older [MEMBER]; SELECT * FROM Win32_OperatingSystem WHERE ((Caption LIKE "%Server 201%") AND (NOT Caption LIKE "%Server 2019%")) AND (ProductType = "3")
 Windows Server 2019 or newer [MEMBER]; SELECT * FROM Win32_OperatingSystem WHERE ((Caption LIKE "%Server 2019%") OR (Caption LIKE "%Server 202%")) AND (ProductType = "3")
+Windows Server 2025 [DC]; SELECT * FROM Win32_OperatingSystem WHERE (Caption LIKE "%Server 2025%") AND (ProductType = "2")
+Windows Server 2025 [ALL]; SELECT * FROM Win32_OperatingSystem WHERE (Caption LIKE "%Server 2025%") AND (ProductType =! "1")
+Windows Server 2025 [MEMBER]; SELECT * FROM Win32_OperatingSystem WHERE (Caption LIKE "%Server 2025%") AND (ProductType = "3")
