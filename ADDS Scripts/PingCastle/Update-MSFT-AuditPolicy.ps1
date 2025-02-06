@@ -1,6 +1,6 @@
 ﻿<#
 
-    List and remove Groups that are member of Domain Admin
+    Add the auditing requirements to the MSFT Domain Controller baselines.
 
 #>
 
