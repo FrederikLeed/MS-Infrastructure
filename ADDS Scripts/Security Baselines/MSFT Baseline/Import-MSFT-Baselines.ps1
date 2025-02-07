@@ -86,7 +86,6 @@ if ($Action -ne "Install") {
 
     $RegexPattern = '"url":"(https:\/\/download\.microsoft\.com\/[^"]+)"'
     $DownloadLinks = [regex]::Matches($HTML.Content, $RegexPattern)
-    $DownloadLinks | Foreach {$_.Groups[1].Value}
 
     Foreach ($URI in $DownloadLinks) {
         $DownloadURI = $URI.Groups[1].Value
