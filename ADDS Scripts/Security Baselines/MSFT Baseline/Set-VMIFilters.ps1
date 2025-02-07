@@ -29,7 +29,7 @@ foreach ($OSVersion In $OSVersions) {
         $GPOs | % {$_.WmiFilter = ($allWmiFilters | Where-Object {$_.Name -like "*$OSVersion*member*"})[0]}
     }
 
-    $GPOs = Get-Gpo -All | Where {$_.DisplayName -like "*MSFT*$OSVersion*Domain Controller"}
+    $GPOs = Get-Gpo -All | Where {$_.DisplayName -like "*MSFT*$OSVersion*Domain Controller*"}
     if ($Null -ne $GPOs) {
         $GPOs | % {$_.WmiFilter = ($allWmiFilters | Where-Object {$_.Name -like "*$OSVersion*DC*"})[0]}
     }
