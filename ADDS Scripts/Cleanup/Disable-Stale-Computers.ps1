@@ -33,7 +33,7 @@ Foreach ($Computer in $Computers) {
         -Replace @{AdminDescription="Location:$(($Computer.DistinguishedName).Split(",",2)[1])"}
 
     If ($Null -ne $TargetOU) {
-        Move-ADObject -Identity $User.DistinguishedName -TargetPath $TargetOU.DistinguishedName
+        Move-ADObject -Identity $Computer.DistinguishedName -TargetPath $TargetOU.DistinguishedName
     }
 }
 
