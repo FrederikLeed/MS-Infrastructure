@@ -8,8 +8,8 @@ Setup Scheduled task to run PingCastleAutoUpdate every Friday at 05:00
 Setup Scheduled task to run PingCastle every night at 06:00  
 
 ToDo.  
-Add binding 443
-Add Domain Cert
+Add binding 443  
+Add Domain Cert  
 
 To install just run.
 PowerShell.exe -executionpolicy bypass -file '.\Install - PingCastle webservice.ps1' -$ADGroupName "PingCastle Viewers" -Verbose
