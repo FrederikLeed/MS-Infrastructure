@@ -35,15 +35,6 @@ Catch {
 }
 
 
-# Create backup folder
-# ------------------------------------------------------------
-$FileDate = (Get-Date -Format "yyyy-MM-dd HH.mm")
-$GpoFilePath = $($BackupPath + "\" + $FileDate)
-If (!(Test-Path -Path $GpoFilePath)) {
-    New-Item -Path $GpoFilePath -ItemType Directory | Out-Null
-}
-    
-
 # Import modules
 # ------------------------------------------------------------
 Write-Verbose "Import Required modules"
@@ -63,6 +54,15 @@ Write-Verbose "Get GPO's changed since $LatestExportTime"
 $GPOs = Get-GPO -All | Where { $_.ModificationTime -gt $LatestExportTime }
 
 
+# Create backup folder if there are any changes.
+# ------------------------------------------------------------
+$FileDate = (Get-Date -Format "yyyy-MM-dd HH.mm")
+$GpoFilePath = $($BackupPath + "\" + $FileDate)
+If ( (!(Test-Path -Path $GpoFilePath)) -AND ($GPOs.Count -gt 0) ) {
+    New-Item -Path $GpoFilePath -ItemType Directory | Out-Null
+}
+
+
 $OutReport = @()
 $ErrorReport = @()
 Foreach ($GPO in $GPOs) {
@@ -70,11 +70,13 @@ Foreach ($GPO in $GPOs) {
     $GPODisplayName = $GPO.DisplayName.trim()
 
     # Add to the error report if leading or traling spaces in displayname
+    # ------------------------------------------------------------
     if ($($GPO.DisplayName) -match "^\s|\s$") {
         $ErrorReport += "`"$($GPO.DisplayName)`" have leading or traling spaces in displayname"
     }
 
     # Remove leading and trailing spaces from displayname
+    # ------------------------------------------------------------
     if ($AutoCorrect) {
         $GPO.DisplayName = $GPO.DisplayName.Trim()
     }
@@ -133,7 +135,9 @@ Foreach ($GPO in $GPOs) {
 
 }
 
-$OutReport | Export-Csv -Path "$(Split-Path -Path $GpoFilePath -Parent)\$FileDate-GPO-Link-Report.csv" -NoTypeInformation -Delimiter $Delimiter -Encoding UTF8
-if ($ErrorReport.count -gt 0) {
-    $ErrorReport | Out-File -FilePath "$(Split-Path -Path $GpoFilePath -Parent)\Error-Report.log"
+if ($OutReport.count -ge 1) {
+    $OutReport | Export-Csv -Path "$(Split-Path -Path $GpoFilePath -Parent)\$FileDate-GPO-Link-Report.csv" -NoTypeInformation -Delimiter $Delimiter -Encoding UTF8
+}
+if ($ErrorReport.count -ge 1) {
+    $ErrorReport | Out-File -FilePath "$(Split-Path -Path $GpoFilePath -Parent)\$FileDate-Error-Report.log"
 }
