@@ -18,31 +18,31 @@
 #>
 
 param (
-    [parameter(ValueFromPipeline)][string]$BackupPath = $PSScriptRoot,
-    [parameter(ValueFromPipeline)][string]$Delimiter = (Get-Culture).TextInfo.ListSeparator
+    [parameter(ValueFromPipeline)][string]$BackupPath = "\\prod\shares\IT-Admin\GPO-Backup", #$PSScriptRoot,
+    [parameter(ValueFromPipeline)][string]$Delimiter = (Get-Culture).TextInfo.ListSeparator,
+    [switch]$AutoCorrect
 )
 
 
-# Get Date
+# Try to get the latest export date.
 # ------------------------------------------------------------
-$FileDate = Get-Date -Format "dd-MM-yyyy"
+Write-Verbose "Find latest GPO backup in $BackupPath"
+try {
+    $LatestExportTime = $(Get-Date -Date ((Get-ChildItem -Path $BackupPath | Sort-Object CreationTime -Descending | Select-Object -First 1).LastWriteTime) -Format "yyyy-MM-dd HH:mm")
+}
+Catch {
+    $LatestExportTime = "01-01-1970 00:00"
+}
+
+
+# Create backup folder
+# ------------------------------------------------------------
+$FileDate = (Get-Date -Format "yyyy-MM-dd HH.mm")
 $GpoFilePath = $($BackupPath + "\" + $FileDate)
 If (!(Test-Path -Path $GpoFilePath)) {
     New-Item -Path $GpoFilePath -ItemType Directory | Out-Null
 }
-
-
-# Get latest export date (Only export policy that have changed or added since)
-# ------------------------------------------------------------
-#$LatestExportTime = Get-Date -Date "06-09-2023"
-Write-Verbose "Find latest GPO backup in $BackupPath"
-try {
-    $LatestExportTime = $(Get-Date -Date ((Get-ChildItem -Path $GpoFilePath | Sort-Object CreationTime -Descending | Select-Object -First 1).LastWriteTime).ToShortDateString())
-}
-Catch {
-    $LatestExportTime = "01-01-1970"
-}
-
+    
 
 # Import modules
 # ------------------------------------------------------------
@@ -64,30 +64,43 @@ $GPOs = Get-GPO -All | Where { $_.ModificationTime -gt $LatestExportTime }
 
 
 $OutReport = @()
+$ErrorReport = @()
 Foreach ($GPO in $GPOs) {
     Write-Verbose "Export $($GPO.DisplayName)"
-    if (!(Test-Path -Path "$GpoFilePath\$($GPO.DisplayName)")) {
-        New-Item -Path "$GpoFilePath\$($GPO.DisplayName)" -ItemType Directory | Out-Null
+    $GPODisplayName = $GPO.DisplayName.trim()
+
+    # Add to the error report if leading or traling spaces in displayname
+    if ($($GPO.DisplayName) -match "^\s|\s$") {
+        $ErrorReport += "`"$($GPO.DisplayName)`" have leading or traling spaces in displayname"
     }
-    Backup-GPO -Guid $GPO.ID -Path "$GpoFilePath\$($GPO.DisplayName)" | Out-Null
+
+    # Remove leading and trailing spaces from displayname
+    if ($AutoCorrect) {
+        $GPO.DisplayName = $GPO.DisplayName.Trim()
+    }
+
+    if (!(Test-Path -Path "$GpoFilePath\$GPODisplayName")) {
+        New-Item -Path "$GpoFilePath\$GPODisplayName" -ItemType Directory | Out-Null
+    }
+    Backup-GPO -Guid $GPO.ID -Path "$GpoFilePath\$GPODisplayName" | Out-Null
 
     $UserPolicyFiles = Get-ChildItem -Path $($SysVolFolder + "{" + $($GPO.ID) + "}\User\Scripts") -File -Recurse
     if ($UserPolicyFiles.Count -ne 0) {
-        Write-Verbose "Copy scripts from $($GPO.DisplayName) User"
-        New-Item -Path "$GpoFilePath\$($GPO.DisplayName)\UserFiles" -ItemType Directory -ErrorAction SilentlyContinue | Out-Null
-        Copy-Item -Path $($SysVolFolder + "{" + $($GPO.ID) + "}\User\Scripts") -Destination $($GpoFilePath + "\" + $($GPO.DisplayName) + "\UserFiles") -Recurse | Out-Null
+        Write-Verbose "Copy scripts from $GPODisplayName User"
+        New-Item -Path "$GpoFilePath\$GPODisplayName\UserFiles" -ItemType Directory -ErrorAction SilentlyContinue | Out-Null
+        Copy-Item -Path $($SysVolFolder + "{" + $($GPO.ID) + "}\User\Scripts") -Destination $($GpoFilePath + "\" + $GPODisplayName + "\UserFiles") -Recurse | Out-Null
     }
 
     $ComputerPolicyFiles = Get-ChildItem -Path $($SysVolFolder + "{" + $($GPO.ID) + "}\Machine\Scripts") -File -Recurse
     if ($ComputerPolicyFiles.Count -ne 0) {
-        Write-Verbose "Copy scripts from $($GPO.DisplayName) Machine"
-        New-Item -Path "$GpoFilePath\$($GPO.DisplayName)\MachineFiles" -ItemType Directory -ErrorAction SilentlyContinue | Out-Null
-        Copy-Item -Path $($SysVolFolder + "{" + $($GPO.ID) + "}\Machine\Scripts") -Destination $($GpoFilePath + "\" + $($GPO.DisplayName) + "\MachineFiles") -Recurse | Out-Null
+        Write-Verbose "Copy scripts from $GPODisplayName Machine"
+        New-Item -Path "$GpoFilePath\$GPODisplayName\MachineFiles" -ItemType Directory -ErrorAction SilentlyContinue | Out-Null
+        Copy-Item -Path $($SysVolFolder + "{" + $($GPO.ID) + "}\Machine\Scripts") -Destination $($GpoFilePath + "\" + $GPODisplayName + "\MachineFiles") -Recurse | Out-Null
     }
 
     Write-Verbose "Create GPO HTML report"
     [XML]$GPReport = Get-GPOReport -ReportType Xml -Guid $GPO.ID
-    Get-GPOReport -ReportType Html -Guid $GPO.ID -Path $($GpoFilePath + "\" + $($GPO.DisplayName) + "\" + $($GPO.DisplayName) + ".html")
+    Get-GPOReport -ReportType Html -Guid $GPO.ID -Path $($GpoFilePath + "\" + $GPODisplayName + "\" + $($GPO.DisplayName) + ".html")
 
     Write-Verbose "Document the OU's where the Policy is linked"
     if (($GPReport.GPO.LinksTo).Count -eq 0) {
@@ -121,3 +134,6 @@ Foreach ($GPO in $GPOs) {
 }
 
 $OutReport | Export-Csv -Path "$(Split-Path -Path $GpoFilePath -Parent)\$FileDate-GPO-Link-Report.csv" -NoTypeInformation -Delimiter $Delimiter -Encoding UTF8
+if ($ErrorReport.count -gt 0) {
+    $ErrorReport | Out-File -FilePath "$(Split-Path -Path $GpoFilePath -Parent)\Error-Report.log"
+}
