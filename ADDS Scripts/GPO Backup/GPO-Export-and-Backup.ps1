@@ -18,14 +18,15 @@
 #>
 
 param (
-    [parameter(ValueFromPipeline)][string]$BackupPath = $PSScriptRoot
+    [parameter(ValueFromPipeline)][string]$BackupPath = $PSScriptRoot,
+    [parameter(ValueFromPipeline)][string]$Delimiter = (Get-Culture).TextInfo.ListSeparator
 )
 
 
 # Get Date
 # ------------------------------------------------------------
 $FileDate = Get-Date -Format "dd-MM-yyyy"
-$GpoFilePath = $($BackupFolder + "\" + $FileDate)
+$GpoFilePath = $($BackupPath + "\" + $FileDate)
 If (!(Test-Path -Path $GpoFilePath)) {
     New-Item -Path $GpoFilePath -ItemType Directory | Out-Null
 }
@@ -34,8 +35,13 @@ If (!(Test-Path -Path $GpoFilePath)) {
 # Get latest export date (Only export policy that have changed or added since)
 # ------------------------------------------------------------
 #$LatestExportTime = Get-Date -Date "06-09-2023"
-Write-Verbose "Find latest GPO backup in $BackupFolder"
-$LatestExportTime = $(Get-Date -Date ((Get-ChildItem -Path $GpoFilePath | Sort-Object CreationTime -Descending | Select-Object -First 1).LastWriteTime).ToShortDateString())
+Write-Verbose "Find latest GPO backup in $BackupPath"
+try {
+    $LatestExportTime = $(Get-Date -Date ((Get-ChildItem -Path $GpoFilePath | Sort-Object CreationTime -Descending | Select-Object -First 1).LastWriteTime).ToShortDateString())
+}
+Catch {
+    $LatestExportTime = "01-01-1970"
+}
 
 
 # Import modules
@@ -113,4 +119,5 @@ Foreach ($GPO in $GPOs) {
     }
 
 }
-$OutReport | Export-Csv -Path "$(Split-Path -Path $GpoFilePath -Parent)\$FileDate-GPO-Link-Report.csv" -NoTypeInformation -Delimiter ";" -Encoding UTF8
+
+$OutReport | Export-Csv -Path "$(Split-Path -Path $GpoFilePath -Parent)\$FileDate-GPO-Link-Report.csv" -NoTypeInformation -Delimiter $Delimiter -Encoding UTF8
