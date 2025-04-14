@@ -35,7 +35,7 @@ $Selected = $AllGPOs | Select-Object -Property @{Label="GPOName"; Expression={$_
 
 
 # Select Version to restore
-# -----------------------------------------------------------
+# ------------------------------------------------------------
 Write-Verbose "If multiple versions show selector."
 $Versions = $AllGPOs | Where { $_.fullname -like "*\$($Selected.GPOName)\*"} | Select-Object -Property @{Label="GPOName"; Expression={$_.Parent}}, @{Label="Backup Time"; Expression={$($_.Parent).Parent}}, FullName
 if ($Versions.Count -gt 0) {
