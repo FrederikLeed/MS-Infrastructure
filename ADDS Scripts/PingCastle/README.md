@@ -10,4 +10,4 @@ Add binding 443
 Add Domain Cert  
 
 To install just run.
-PowerShell.exe -executionpolicy bypass -file '.\Install - PingCastle webservice.ps1' -$ADGroupName "PingCastle Viewers" -Verbose
+PowerShell.exe -executionpolicy bypass -file '.\Install - PingCastle webservice.ps1' -ADGroupName "PingCastle Viewers" -Verbose
