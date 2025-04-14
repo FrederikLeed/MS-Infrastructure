@@ -16,7 +16,6 @@ $msWMICreationDate = ($now.Year).ToString("0000") + ($now.Month).ToString("00") 
 # --
 # Get WMI filters from file.
 # --
-#$Data = Get-Content -Path "Q:\Active Directory\WMI-Filters\WMI Query.txt"
 $Data = Get-Content -Path "$PSScriptRoot\WMI Query.txt"
 
 # --
