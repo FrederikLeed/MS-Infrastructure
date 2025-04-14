@@ -1,5 +1,3 @@
-### Scripts in this directory.  
-
 #### Install - PingCastle webservice.ps1  
 Install and configure Web Service for PingCastle Free  
   
