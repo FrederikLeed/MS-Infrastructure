@@ -9,8 +9,8 @@ Add WMI filters to each of the imported Baselines.
 
 
 #### Create-Overrides.ps1
-Create Override GPO foreach of the imported GPOs.
-Remove 
+Create Override GPO foreach of the imported GPOs.  
+Add/remove some settings that I ussaly do
 
 
 #### Update-MSFT-AuditPolicy.ps1
