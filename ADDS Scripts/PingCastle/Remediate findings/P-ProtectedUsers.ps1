@@ -1,8 +1,11 @@
 ﻿<#
 
-    Make all Domain Admins member of protected users (Skip Break Glass Administrator)
+    The purpose is to ensure that all privileged accounts are in the Protected User security group
 
-    If there are any accounts used as Service Accounts in the Domain Admins group, please remove and delegate the required permissions.
+    The Protected User group is a special security group which automatically applies protections to minimize credential exposure
+
+
+    Custom step: Ignore builtIn Administrator and defined Break Glass Admin
 
 #>
 

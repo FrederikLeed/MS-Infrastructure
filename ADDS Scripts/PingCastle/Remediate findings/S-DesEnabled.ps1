@@ -1,14 +1,19 @@
 ﻿<#
 
-    Find all accounts that have DES enabled
+    The purpose is to verify that no weak encryption algorithm such as DES is used for accounts
 
-    - If password havnt changed for 12 month, disable the account!
+    It is recommended to disable DES as an encryption algorithm in the user configuration dialog or in the "msDSSupportedEncryptionTypes" attribute at LDAP level.
+    It has to be disabled in the property of an account by unchecking the box "Use Kerberos DES encryption for this account"
+
+    
+    Custom step: If password is not changed for 12 month, disable the account!
 
 #>
 
 # Define max password age.
 # --------------------------------------------------
 $PasswordAge = (Get-Date).AddMonths(-12)
+
 
 # Find all Objects that have DES enabled.
 # --------------------------------------------------

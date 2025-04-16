@@ -1,8 +1,9 @@
 ﻿<#
 
-    Make all Domain Admins "Account is sensitive and cannot be delegated"
+    The purpose is to ensure that all Administrator Accounts have the configuration flag "this account is sensitive and cannot be delegated"
 
-    If there are any accounts used as Service Accounts in the Domain Admins group, please remove and delegate the required permissions.
+    To correct the situation, you should make sure that all your Administrator Accounts have the check-box "This account is sensitive and cannot be delegated"
+    active or add your Administrator Accounts to the built-in group "Protected Users"
 
 #>
 

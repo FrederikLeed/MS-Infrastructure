@@ -8,13 +8,17 @@
 
 # Define max password age.
 # --------------------------------------------------
-$PasswordAge = (Get-Date).AddMonths(-12)
+$DisableTimeSpan = 180
+$PasswordAge = (Get-Date).AddMonths(-6)
 
 
 # Find all Domain Admins that have OLD password
 # --------------------------------------------------
+
+Get-ADUser -Filter { LastLogonTimeStamp -lt $LastLogon -and PasswordLastSet -lt $PasswordAge -and Enabled -eq 'True' } -Properties Description,PasswordLastSet
+
 $OldAdmis = Get-ADGroupMember "Domain Admins" | Get-ADUser -Properties PasswordLastSet | Where-Object {
-    $_.PasswordLastSet -lt $PasswordAge -and $_.Enabled -eq $True
+    $_.LastLogonTimeStamp -lt $LastLogon -and $_.PasswordLastSet -lt $PasswordAge -and $_.Enabled -eq $True
 }
 
 

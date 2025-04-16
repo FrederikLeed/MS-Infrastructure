@@ -6,6 +6,7 @@
 #>
 
 $DisableTimeSpan = 180
+$PasswordAge = (Get-Date).AddMonths(-12)
 
 
 # Usable Date formats.
@@ -24,7 +25,7 @@ Catch {
 }
 
 
-$Users = Get-ADUser -Filter { LastLogonTimeStamp -lt $LastLogon -and Enabled -eq 'True' } -Properties Description
+$Users = Get-ADUser -Filter { LastLogonTimeStamp -lt $LastLogon -and PasswordLastSet -lt $PasswordAge -and Enabled -eq 'True' } -Properties Description,PasswordLastSet
 Foreach ($User in $Users) {
     Write-Verbose "Disable User : $($User.DistinguishedName)"
 
