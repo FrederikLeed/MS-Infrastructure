@@ -1,4 +1,4 @@
-The scripts in this folder is embedded in the "Install - PingCastle webservice.ps1"  
+The script in this folder is embedded in the "Install - PingCastle webservice.ps1"  
 
 Encoding done.
 $Bytes = [System.Text.Encoding]::UTF8.GetBytes($CreateReportPs1)
