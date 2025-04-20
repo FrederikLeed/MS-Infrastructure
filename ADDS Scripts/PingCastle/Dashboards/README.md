@@ -1,6 +1,6 @@
 ## PingCastle Dashbords.  
-I have used Copilot and Chatgpt to create, feel free to use, copy and modify.  
-It have been years since I last created any meningfull html or javascript, so this created with all the AI help I can get, just to have a little fun with the data avalible.
+It have been years since I last created any meningfull html or javascript, so this created with all the AI help I can get, ChatGpt and Copilot.
+just to have a little fun with the data avalible, feel free to copy and modify.
   
 Requires the PingCastle repports to be in seperate folders with dateformat like the "Create-Report.ps1" do that is used by my "Install - PingCastle webservice.ps1" script.
   
