@@ -6,6 +6,7 @@ It have been years since I last created any meningfull html or javascript, so th
 Combines the Calender and GraphJs into one page.  
 takes a minute to load, the server needs to parse all the xml files.
   
+![DEFAULT](https://raw.githubusercontent.com/SysAdminDk/MS-Infrastructure/tree/main/ADDS%20Scripts/PingCastle/Dashboards/images/default-example.png)  
   
 ### Calender.asp  
 Shows the last 3 monts with links to the html reports.
