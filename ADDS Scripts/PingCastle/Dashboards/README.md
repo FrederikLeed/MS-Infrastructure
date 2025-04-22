@@ -20,4 +20,4 @@ Shows the last 3 monts with links to the html reports.
 Show a graph with the 4 scores, 3 month back.  
 takes a minute to load, the server needs to parse all the xml files.  
   
-![GraphJS](https://github.com/SysAdminDk/MS-Infrastructure/blob/4d2d96abdc344e15105077fa22261c2dd1a84b29/ADDS%20Scripts/PingCastle/Dashboards/images/GraphJS-example.png)
+![GraphJS](https://github.com/SysAdminDk/MS-Infrastructure/blob/a3d4f99e9d8621b9d0b9ed2e96a6a77cab0c8ab8/ADDS%20Scripts/PingCastle/Dashboards/images/GraphJS-example.png)
