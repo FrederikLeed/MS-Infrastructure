@@ -66,6 +66,34 @@ For Each subfolder In folder.SubFolders
   End If
 Next
 
+Dim sortedGraphData
+Set sortedGraphData = CreateObject("Scripting.Dictionary")
+
+Dim sortedKeys, sortedKey
+sortedKeys = Array()
+For Each key In graphData.Keys
+  ReDim Preserve sortedKeys(UBound(sortedKeys) + 1)
+  sortedKeys(UBound(sortedKeys)) = key
+Next
+
+' Sort the keys (dates) in ascending order
+Dim temp, i, j
+For i = LBound(sortedKeys) To UBound(sortedKeys) - 1
+  For j = i + 1 To UBound(sortedKeys)
+    If sortedKeys(i) > sortedKeys(j) Then
+      temp = sortedKeys(i)
+      sortedKeys(i) = sortedKeys(j)
+      sortedKeys(j) = temp
+    End If
+  Next
+Next
+
+' Create sorted dictionary
+For i = LBound(sortedKeys) To UBound(sortedKeys)
+  sortedKey = sortedKeys(i)
+  sortedGraphData.Add sortedKey, graphData(sortedKey)
+Next
+
 Dim labels, staleObjectsData, privilegiedGroupData, trustData, anomalyData
 labels = ""
 staleObjectsData = ""
@@ -73,10 +101,10 @@ privilegiedGroupData = ""
 trustData = ""
 anomalyData = ""
 
-For Each key In graphData.Keys
+For Each key In sortedGraphData.Keys
   labels = labels & """" & key & ""","
   Dim values
-  values = graphData(key)
+  values = sortedGraphData(key)
   staleObjectsData = staleObjectsData & values(0) & ","
   privilegiedGroupData = privilegiedGroupData & values(1) & ","
   trustData = trustData & values(2) & ","
@@ -102,21 +130,27 @@ chartData = "{labels: [" & labels & "], datasets: [{label: 'Stale Objects Score'
   <title>PingCastle Report Dashboard</title>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <style>
-    table.calendar { border-collapse: collapse; width: 100%; }
-    table.calendar th, td { padding: 6px; text-align: center; border: 1px solid #ccc; }
+  <style>
+    body { font-family: Arial, sans-serif; margin: 0; padding: 0; background-color: #f9f9f9; }
+    h1 { text-align: center; margin: 20px 0; color: #333; }
+    table.calendar { border-collapse: collapse; width: 100%; margin: 5px auto; }
+    table.calendar th, table.calendar td { padding: 5px; text-align: center; border: 1px solid #ccc; }
     .today { background-color: #ffffcc; font-weight: bold; }
-    .monthname { font-weight: bold; padding: 5px; background: #f0f0f0; }
-    .chart-container { height: 300px; width: 100%; }
-    .footer { text-align: center; margin-top: 20px; font-size: 12px; color: #666; }
+    .monthname { font-weight: bold; padding: 5px; background: #f0f0f0; text-align: center; }
+    .chart-container { margin: 1px auto; max-width: 800px; height: 400px; }
+    a { text-decoration: none; color: #000; }
+    a:hover { color: #0073e6; }    
   </style>
 </head>
 <body>
-  <h1 style="text-align:center;">PingCastle Report Dashboard</h1>
   <!-- Calendar Display -->
   <table align=center>
     <tr>
+      <td colspan=3><h1 style="text-align:center;">PingCastle Report Dashboard</h1></td>
+    </tr>
+    <tr>
 <%
-Dim baseDate, i
+Dim baseDate
 baseDate = Now()
 
 For i = 2 To 0 Step -1
@@ -179,25 +213,37 @@ Next
   <script>
     var chartData = <%= chartData %>;
 
-    var ctx = document.getElementById('ScoreChart').getContext('2d');
-    new Chart(ctx, {
+  // Initialize Chart.js
+  var ctx = document.getElementById('ScoreChart').getContext('2d');
+  new Chart(ctx, {
       type: 'line',
       data: chartData,
       options: {
-        responsive: true,
-        maintainAspectRatio: false,
-        scales: {
-          y: {
-            beginAtZero: true,
-            stepSize: 1
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+              legend: {
+                  position: 'bottom' // Moves legend below the graph
+              }
+          },
+          scales: {
+              x: {
+                  ticks: {
+                      callback: function(value, index, ticks) {
+                          // Shorten label to dd-MM format
+                          var parts = this.getLabelForValue(value).split("-");
+                          return parts[0] + "-" + parts[1]; // Format: dd-MM
+                      }
+                  }
+              },
+              y: {
+                  beginAtZero: true, // Ensure y-axis starts at 0
+                  stepSize: 1        // Define step size for better visualization
+              }
           }
-        }
       }
-    });
-  </script>
-  </td></tr></table>
-  <div class="footer">
-    <a href="./ad_hc_rules_list.html">PingCastle Healthcheck rules</a>
-  </div>
+  });
+</script>
+
 </body>
 </html>
