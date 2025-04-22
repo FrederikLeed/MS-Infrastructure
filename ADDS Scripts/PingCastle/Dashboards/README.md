@@ -7,12 +7,18 @@ Requires the PingCastle repports to be in seperate folders with dateformat like 
 
 ### Default.asp  
 Combines the Calender and GraphJs into one page.  
-takes a minute to load, the server needs to parse all the xml files.
+takes a minute to load, the server needs to parse all the xml files.  
+  
+![Default](https://github.com/SysAdminDk/MS-Infrastructure/blob/cb1dd44ee792352b35bc0124b51de8a5e87629e8/ADDS%20Scripts/PingCastle/Dashboards/images/Default-example.png)
+  
+### ListRules.asp  
+Finds ALL xml files in the folder, and list ALL findings, mark the removed with a date.  
+takes a minute to load, the server needs to parse all the xml files.  
   
 ![Default](https://github.com/SysAdminDk/MS-Infrastructure/blob/cb1dd44ee792352b35bc0124b51de8a5e87629e8/ADDS%20Scripts/PingCastle/Dashboards/images/Default-example.png)
   
 ### Calender.asp  
-Shows the last 3 monts with links to the html reports.
+Shows the last 3 monts with links to the html reports.  
   
 ![Calender](https://github.com/SysAdminDk/MS-Infrastructure/blob/4702c119e1785850ba130b1b2204c95eda43299d/ADDS%20Scripts/PingCastle/Dashboards/images/Calender-example.png)
   
