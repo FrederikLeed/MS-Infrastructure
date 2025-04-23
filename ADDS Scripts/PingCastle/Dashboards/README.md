@@ -32,3 +32,5 @@ takes a minute to load, the server needs to parse all the xml files.
 #### License requirements.
 Please note this is created in my spare time, I use PingCastle at work and have an Auditor license.
 I recommend purchasing an enterprise license if you want more detailed reports.  
+
+https://pingcastle.com/purchase/
