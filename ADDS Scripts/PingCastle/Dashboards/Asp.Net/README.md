@@ -27,4 +27,5 @@ takes a minute to load, the server needs to parse all the xml files.
 ![Rules](https://github.com/SysAdminDk/MS-Infrastructure/blob/c2c70f167b63cc17f798e72dbbe414ce98aa0af1/ADDS%20Scripts/PingCastle/Dashboards/Asp.Net/images/Findings-aspx.png)  
   
   
-#### Please note this is created in my spare time, I use PingCastle at work and have an Auditor license for that. I recommend purchasing an enterprise license if you want more detailed reports.  
+#### Please note this is created in my spare time, I use PingCastle at work and have an Auditor license for that.  
+#### I recommend purchasing an enterprise license if you want more detailed reports.  
