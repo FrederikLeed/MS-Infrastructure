@@ -27,3 +27,7 @@ Show a graph with the 4 scores, 3 month back.
 takes a minute to load, the server needs to parse all the xml files.  
   
 ![GraphJS](https://github.com/SysAdminDk/MS-Infrastructure/blob/a3d4f99e9d8621b9d0b9ed2e96a6a77cab0c8ab8/ADDS%20Scripts/PingCastle/Dashboards/images/GraphJS-example.png)
+  
+  
+#### Please note this is created in my spare time, I use PingCastle at work and have an Auditor license for that.  
+#### I recommend purchasing an enterprise license if you want more detailed reports.  
