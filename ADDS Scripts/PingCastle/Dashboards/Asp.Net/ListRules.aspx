@@ -24,8 +24,8 @@
       <th>Model</th>
       <th>RiskId</th>
       <th>Rationale</th>
-      <th>Date Added</th>
-      <th>Date Removed</th>
+      <th Width="75px">Added</th>
+      <th Width="75px">Removed</th>
     </tr>
     <asp:Literal ID="TableRows" runat="server" />
   </table>
