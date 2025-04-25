@@ -20,8 +20,5 @@ Remote All nested groups from all BuiltIn High Privilige groups
 #### Set-AccountNotDelegated.ps1
 To ensure all users in BuiltIn High Privilige groups have the "this account is sensitive and cannot be delegated" flag set.
 
-#### Set-ProtectedUsers.ps1
-To ensure all users in BuiltIn High Privilige groups is member of the Protected Users group.
-
 #### ValidatePasswords.ps1
 To ensure password policy requires atleast 14 chars, and all users in BuiltIn High Privilige groups, have changed password recently.
