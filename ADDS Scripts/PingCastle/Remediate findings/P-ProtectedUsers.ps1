@@ -11,7 +11,7 @@
 
 # Define YOUR breakglass accounts that will be skipped.
 # --------------------------------------------------
-$BreakGlassAccountNames = ""#@("Administrator","AdminBreakGlass")
+$BreakGlassAccountNames = @("Administrator","AdminBreakGlass")
 
 
 # Get the Sensitive groups
@@ -31,3 +31,4 @@ Where-Object { $_.Name -notIn $BreakGlassAccountNames -and $_.objectClass -eq "u
 Foreach ($User in $DomainAdmins | Select-Object Name, UserPrincipalName, DistinguishedName | Out-GridView -Title "Select all the accounts to add to `"Protected Users`"" -OutputMode Multiple) {
     Add-ADGroupMember -Identity "Protected Users" -Members $User.DistinguishedName
 }
+
