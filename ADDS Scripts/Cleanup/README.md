@@ -17,8 +17,5 @@ Find and delete all GPOs that is NOT linked to any OUs or have all settings disa
 #### Remove-NestedGroups.ps1
 Remote All nested groups from all BuiltIn High Privilige groups
 
-#### Set-AccountNotDelegated.ps1
-To ensure all users in BuiltIn High Privilige groups have the "this account is sensitive and cannot be delegated" flag set.
-
 #### ValidatePasswords.ps1
 To ensure password policy requires atleast 14 chars, and all users in BuiltIn High Privilige groups, have changed password recently.
