@@ -14,9 +14,6 @@ Removes all users that have been disabled with the "Disable-Stale-Users.ps1" aft
 Find and delete all GPOs that is NOT linked to any OUs or have all settings disabled.
 - Please run the GPO Backup/GPO-Export-and-Backup.ps1 prior to executing this.
 
-#### FixPrintNightMare.ps1
-Create GPO to mitigate the Print Spooler issues, and assign to Domain Controllers OU.
-
 #### Remove-NestedGroups.ps1
 Remote All nested groups from all BuiltIn High Privilige groups
 
