@@ -1,21 +1,21 @@
 ### Disclaimer Regarding PingCastle Usage
     
+PingCastle Licensing:  
 PingCastle's free "Basic Edition" is intended for personal use or auditing your own systems.
 Commercial use, including generating reports for third parties, requires an appropriate license.
 For more details, refer to PingCastle's Terms and Conditions.
-
     
-User Responsibility:
+User Responsibility:  
 Users of these scripts are responsible for ensuring compliance with PingCastle's licensing terms.
 If you intend to use PingCastle for commercial purposes or require advanced features,
 you must obtain the necessary license directly from PingCastle.
-
     
-No Warranty:
+No Warranty:  
 These scripts are provided as-is, without any warranty or guarantee of compliance with
 PingCastle's licensing terms. Use them at your own discretion.
-
-
+  
+  
+  
 #### Install - PingCastle webservice.ps1  
 Install and configure Web Service for PingCastle Free  
   
