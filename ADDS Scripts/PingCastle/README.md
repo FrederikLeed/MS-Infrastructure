@@ -1,15 +1,15 @@
 ### Disclaimer Regarding PingCastle Usage
     
 PingCastle Licensing:  
-PingCastle's free "Basic Edition" is intended for personal use or auditing your own systems.
-Commercial use, including generating reports for third parties, requires an appropriate license.
-For more details, refer to PingCastle's Terms and Conditions.
+PingCastle's free "Basic Edition" is intended for personal use or auditing your own systems.  
+Commercial use, including generating reports for third parties, requires an appropriate license.  
+For more details, refer to PingCastle's Terms and Conditions.  
 http://www.pingcastle.com
     
 User Responsibility:  
-Users of these scripts are responsible for ensuring compliance with PingCastle's licensing terms.
-If you intend to use PingCastle for commercial purposes or require advanced features,
-you must obtain the necessary license directly from PingCastle.
+Users of these scripts are responsible for ensuring compliance with PingCastle's licensing terms.  
+If you intend to use PingCastle for commercial purposes or require advanced features,  
+you must obtain the necessary license directly from PingCastle.  
       
   
   
