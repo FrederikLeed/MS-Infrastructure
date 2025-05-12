@@ -18,7 +18,7 @@
 #>
 
 param (
-    [parameter(ValueFromPipeline)][string]$BackupPath = "\\prod\shares\IT-Admin\GPO-Backup", #$PSScriptRoot,
+    [parameter(ValueFromPipeline)][string]$BackupPath = $PSScriptRoot,
     [parameter(ValueFromPipeline)][string]$Delimiter = (Get-Culture).TextInfo.ListSeparator,
     [switch]$AutoCorrect
 )
@@ -67,19 +67,34 @@ $OutReport = @()
 $ErrorReport = @()
 Foreach ($GPO in $GPOs) {
     Write-Verbose "Export $($GPO.DisplayName)"
-    $GPODisplayName = $GPO.DisplayName.trim()
 
-    # Add to the error report if leading or traling spaces in displayname
+
+    # Verify GPO Displayname can be used as Folder Name
     # ------------------------------------------------------------
-    if ($($GPO.DisplayName) -match "^\s|\s$") {
-        $ErrorReport += "`"$($GPO.DisplayName)`" have leading or traling spaces in displayname"
+    if ($($GPO.DisplayName) -match '[<>:"/\\|?*\x00-\x1F]|\s$|^\s|\.$') {
+        $ErrorReport += "`"$($GPO.DisplayName)`" have leading, traling spaces or invalid chars in the displayname"
+
+
+        # Sanitize GPO Name
+        # ------------------------------------------------------------
+        $GPODisplayName = $GPO.DisplayName -replace '[<>:"/\\|?*\x00-\x1F]', '_'
+        $GPODisplayName = $GPODisplayName.TrimEnd(' ', '.')
+
+
+        # Autocorrect GPO DisplayName
+        # ------------------------------------------------------------
+        if ($AutoCorrect) {
+            $OriginalName = $GPO.DisplayName
+            $GPO.DisplayName = $GPO.DisplayName -replace '[<>:"/\\|?*\x00-\x1F]', '_'
+            $GPO.DisplayName = $GPO.DisplayName.Trim()
+
+            Write-Verbose "Auto-corrected GPO name: '$OriginalName' => '$($GPO.DisplayName)'"
+        }
+
+    } else {
+        $GPODisplayName = $GPO.DisplayName
     }
 
-    # Remove leading and trailing spaces from displayname
-    # ------------------------------------------------------------
-    if ($AutoCorrect) {
-        $GPO.DisplayName = $GPO.DisplayName.Trim()
-    }
 
     if (!(Test-Path -Path "$GpoFilePath\$GPODisplayName")) {
         New-Item -Path "$GpoFilePath\$GPODisplayName" -ItemType Directory | Out-Null
