@@ -5,7 +5,7 @@
 
 #>
 
-$DisableTimeSpan = 180
+$DisableTimeSpan = ((Get-Date) - (Get-Date).AddMonths(-6)).Days
 
 
 # Usable Date formats.
