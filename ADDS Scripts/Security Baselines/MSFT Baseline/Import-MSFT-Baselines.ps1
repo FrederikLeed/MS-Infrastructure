@@ -65,7 +65,7 @@ param (
 
 #
 # Create Output folders, if not exists
-#
+# ------------------------------------------------------------
 if ( (!(Test-Path $Path)) -and ($Action -ne "Install") ) {
     Write-Verbose "Create download directory"
     New-Item -Path $Path -ItemType Directory -Force | Out-Null
@@ -78,9 +78,8 @@ if ($Action -ne "Install") {
     }
 
 
-    #
     # Download MS Security Baselines
-    #
+    # ------------------------------------------------------------
     Write-Verbose "Download MSFT security baselines"
     $HTML = Invoke-WebRequest -Uri "https://www.microsoft.com/en-us/download/details.aspx?id=$DownloadID" -UseBasicParsing
 
@@ -95,13 +94,15 @@ if ($Action -ne "Install") {
         Invoke-WebRequest -Uri "$DownloadURI" -OutFile "$Path\ZIP\$FileName"
     }
 
-    #
-    # Extract GPO baselines
-    #
+
+    # Load Required Assembly "Compression"
+    # ------------------------------------------------------------
     Write-Verbose "Extract the Group Policy files"
     [Reflection.Assembly]::LoadWithPartialName('System.IO.Compression.FileSystem') | Out-Null
 
-    # Get ZIP files to extract
+
+    # Extract ZIP file
+    # ------------------------------------------------------------
     $Files = (Get-ChildItem -Path "$Path\ZIP\*")
     foreach ($File in $Files) {
         $DestinationFolder = $($File.Name -replace(".zip"))
@@ -121,26 +122,25 @@ if ($Action -ne "Install") {
     }
 
 
-    #
     # Remove ZIP files
-    #
+    # ------------------------------------------------------------
     if ($Cleanup -eq "Yes") {
         Remove-Item -Path "$Path\ZIP" -Recurse -Force
     }
 }
 
-#
+
 # First part done, notify the we are done.
-#
+# ------------------------------------------------------------
 if ($Action -eq "Download") {
     Write-Output "Copy `"$Path`" content to server with write access to Active Directory for import of the baseline GPOs"
 }
 
 
 if ($Action -ne "Download") {
-    #
+
     # Select Policy to import
-    #
+    # ------------------------------------------------------------
     Write-Verbose "List all avaliable policy files"
     $GPOList = Get-ChildItem -Path $Path -Recurse -Directory -Filter "{*}"
     if ($GPOList.Length -eq 0) {
@@ -164,9 +164,8 @@ if ($Action -ne "Download") {
     }
 
 
-    #
     # Import selected GPOs 
-    #
+    # ------------------------------------------------------------
     Foreach ($GPO in $Selected) {
         $GpoPath = (Get-ChildItem -Path $Path -Recurse | Where {$_.Name -eq $($GPO.Guid)}).Parent
         Write-Verbose "Import GPO : `"$($GPO.Name)`""
@@ -181,9 +180,8 @@ if ($Action -ne "Download") {
 }
 
 
-#
 # Cleanup
-#
+# ------------------------------------------------------------
 if ( ($Action -ne "Download") -and ($Cleanup -eq "Yes") ) {
     Write-Verbose "Cleanup policy folders"
     Get-ChildItem -Path $Path -Directory | Remove-Item -Recurse -Force
