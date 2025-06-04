@@ -14,6 +14,8 @@
 $DHCPServers = Get-DHCPServerInDC
 $DHCPServers | % { Get-DhcpServerv4Scope -ComputerName $_.DNSName }
 
+### TODO
+
 
 
 
