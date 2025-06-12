@@ -17,6 +17,9 @@
         - Add Check for Domain Member
         - Add Windows Laps Unencrypted, no history.
 
+    ToDo
+        - Add Find All function to list all Computers the user have access to view LAPS password on.
+
 
     License Info:
     MIT License
@@ -57,7 +60,7 @@ if (!(gwmi win32_computersystem).partofdomain) {
 # Action on the Search button
 # ------------------------------------------------------------
 $DoSearch = {
-    Write-Debug "#$($ComputerName.Text)#"
+    Write-Debug "$($ComputerName.Text)"
 
     try {
         $LapsData = Get-LapsADPassword -Identity $($ComputerName.Text) -AsPlainText -ErrorAction SilentlyContinue
@@ -95,6 +98,63 @@ $DoSearch = {
 
         Write-Debug "No LAPS password found"
     }
+
+}
+
+$DoList = {
+    # ToDo
+
+    # 
+    Add-Type -AssemblyName System.DirectoryServices
+
+    # Get current user
+    $currentUser = [System.Security.Principal.WindowsIdentity]::GetCurrent().Name
+    $samAccountName = $currentUser.Split("\")[-1]
+
+    # Retrieve user's group memberships
+    $userSearcher = New-Object DirectoryServices.DirectorySearcher
+    $userSearcher.Filter = "(&(objectCategory=User)(samAccountName=$samAccountName))"
+    $userSearcher.PropertiesToLoad.Add("memberof") | Out-Null
+    $userResult = $userSearcher.FindOne()
+
+    $groups = @()
+    foreach ($group in $userResult.Properties["memberof"]) {
+        $groups += $group
+    }
+
+    # Search for computers where these groups have LAPS read permissions
+    $computerSearcher = New-Object DirectoryServices.DirectorySearcher
+    $computerSearcher.Filter = "(&(objectCategory=computer))"
+    $computerSearcher.PropertiesToLoad.Add("name") | Out-Null
+
+    $results = $computerSearcher.FindAll()
+    $accessibleComputers = @()
+
+    if ($groups -match "CN=Domain Admins") {
+
+        $accessibleComputers = $results | % { $_.Properties["name"][0] }
+
+    } else {
+
+        foreach ($result in $results) {
+            $computerEntry = [ADSI]"$($result.Path)"
+            $acl = $computerEntry.psbase.ObjectSecurity.Access
+
+            foreach ($ace in $acl) {
+                foreach ($group in $groups) {
+                    if ($ace.IdentityReference -match $group -and `
+                        ($ace.ActiveDirectoryRights -match "ReadProperty")) {
+                        $accessibleComputers += $result.Properties["name"][0]
+                    }
+                }
+            }
+        }
+
+    }
+
+    # Output computers where user has access
+    $accessibleComputers
+
 
 }
 
@@ -243,12 +303,21 @@ $ComputerName.Add_KeyDown({
 
 $Queryform.Controls.Add($ComputerName)
 
+##
 $searchButton = New-Object System.Windows.Forms.Button
 $searchButton.Location = New-Object System.Drawing.Point(470,30)
 $searchButton.Size = New-Object System.Drawing.Size(73,22)
 $searchButton.Text = 'Search'
 $searchButton.Add_Click($DoSearch)
 $Queryform.Controls.Add($searchButton)
+
+##
+$listButton = New-Object System.Windows.Forms.Button
+$listButton.Location = New-Object System.Drawing.Point(470,60)
+$listButton.Size = New-Object System.Drawing.Size(73,22)
+$listButton.Text = 'List All'
+$listButton.Add_Click($DoList)
+#$Queryform.Controls.Add($listButton)
 
 ##
 $PasswordLabel = New-Object System.Windows.Forms.Label
