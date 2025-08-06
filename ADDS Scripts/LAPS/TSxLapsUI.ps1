@@ -16,10 +16,8 @@
           Changed to ADSI lookup.
         - Add Check for Domain Member
         - Add Windows Laps Unencrypted, no history.
-
-    ToDo
-        - Add Find All function to list all Computers the user have access to view LAPS password on.
-
+    Version - 0.8 - 2025-06-27
+        - Add Phonetic Alphabet view option.
 
     License Info:
     MIT License
@@ -55,6 +53,10 @@ if (!(gwmi win32_computersystem).partofdomain) {
     Throw "Running on Workgroup machine, unable to continue"
 }
 
+# Phonetic Alphabet array.
+# ------------------------------------------------------------
+$PhoneticArray = @{'A'=' Alpha ';'B'=' Bravo ';'C'=' Charlie ';'D'=' Delta ';'E'=' Echo ';'F'=' Foxtrot ';'G'=' Golf ';'H'=' Hotel ';'I'=' India ';'J'=' Juliet ';'K'=' Kilo ';'L'=' Lima ';'M'=' Mike ';'N'=' November ';'O'=' Oscar ';'P'=' Papa ';'Q'=' Quebec ';'R'=' Romeo ';'S'=' Sierra ';'T'=' Tango ';'U'=' Uniform ';'V'=' Victory ';'W'=' Whiskey ';'X'=' X-ray ';'Y'=' Yankee ';'Z'=' Zulu ';'0'=' Zero ';'1'=' One ';'2'=' Two ';'3'=' Three ';'4'=' Four ';'5'=' Five ';'6'=' Six ';'7'=' Seven ';'8'=' Eight ';'9'=' Nine '}
+
 
 
 # Action on the Search button
@@ -83,13 +85,14 @@ $DoSearch = {
             Write-Debug "PW Source is Windows Laps - EncryptedPassword"
             $global:Source = "Encrypted"
             $HistoryButton.Show()
+            $PhoneticButton.Show()
 
         } else {
 
             Write-Debug "PW Source - LegacyLapsCleartextPassword or CleartextPassword"
             $global:Source = "Cleartext"
             $HistoryButton.Hide()
-
+            $PhoneticButton.Show()
         }
 
     } else {
@@ -186,6 +189,48 @@ $DoExpire = {
     }
 }
 
+$ShowPhonetic = {
+
+    # Phonetic Password window
+    # ------------------------------------------------------------
+    $Phoneticform = New-Object System.Windows.Forms.Form
+    $Phoneticform.Text = 'TS - Phonetic Password Window'
+    $Phoneticform.Size = New-Object System.Drawing.Size(566,303)
+    $Phoneticform.StartPosition = 'CenterScreen'
+    $Phoneticform.FormBorderStyle = 'FixedDialog'
+    $Phoneticform.MaximizeBox = $false
+    $Phoneticform.MinimizeBox = $false
+
+    ##
+    $PhoneticLabel = New-Object System.Windows.Forms.Label
+    $PhoneticLabel.Location = New-Object System.Drawing.Point(10,15)
+    $PhoneticLabel.Size = New-Object System.Drawing.Size(450,15)
+    $PhoneticLabel.Text = 'Phonetic Alphabet Password'
+    $Phoneticform.Controls.Add($PhoneticLabel)
+
+
+    $PhoneticPassword = New-Object System.Windows.Forms.textbox # ListBox
+    $PhoneticPassword.Location = New-Object System.Drawing.Point(12,30)
+    $PhoneticPassword.Size = New-Object System.Drawing.Size(530,190)
+    $PhoneticPassword.Font = (New-Object System.Drawing.Font("Arial", 12))
+    $PhoneticPassword.Multiline = $true
+    $PhoneticPassword.ReadOnly = $True
+    $PhoneticPassword.TabStop = $False
+    $Phoneticform.Controls.Add($PhoneticPassword)
+
+
+    $PhoneticPassword.Text = "ABCDEFGHIJKLMNOPQRSTUVWXYZ" 
+
+
+    $exitButton = New-Object System.Windows.Forms.Button
+    $exitButton.Location = New-Object System.Drawing.Point(470,225)
+    $exitButton.Size = New-Object System.Drawing.Size(73,22)
+    $exitButton.Text = 'Exit'
+    $Phoneticform.CancelButton = $exitButton
+    $Phoneticform.Controls.Add($exitButton)
+
+    $Phoneticform.ShowDialog() | Out-Null
+}
 
 $SnowHistory = {
 
@@ -273,6 +318,7 @@ $SnowHistory = {
 Add-Type -AssemblyName System.Windows.Forms
 Add-Type -AssemblyName System.Drawing
 
+
 # Query window
 # ------------------------------------------------------------
 $Queryform = New-Object System.Windows.Forms.Form
@@ -335,7 +381,7 @@ $LapsPassword.ReadOnly = $True
 $LapsPassword.TabStop = $False
 $Queryform.Controls.Add($LapsPassword)
 
-
+##
 $HistoryButton = New-Object System.Windows.Forms.Button
 $HistoryButton.Location = New-Object System.Drawing.Point(470,79)
 $HistoryButton.Size = New-Object System.Drawing.Size(73,22)
@@ -343,6 +389,17 @@ $HistoryButton.Text = 'History'
 $HistoryButton.Hide()
 $HistoryButton.Add_Click($SnowHistory)
 $Queryform.Controls.Add($HistoryButton)
+
+
+##
+$PhoneticButton = New-Object System.Windows.Forms.Button
+$PhoneticButton.Location = New-Object System.Drawing.Point(470,105)
+$PhoneticButton.Size = New-Object System.Drawing.Size(73,22)
+$PhoneticButton.Text = 'Phonetic'
+$PhoneticButton.Hide()
+$PhoneticButton.Add_Click($ShowPhonetic)
+$Queryform.Controls.Add($PhoneticButton)
+
 
 ##
 $ExpirationLabel = New-Object System.Windows.Forms.Label
