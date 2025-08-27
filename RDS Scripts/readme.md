@@ -1,5 +1,7 @@
 ### The example scripts in this folder, will setup an Remote Desktop Session Host farm for accesing Management servers in Active Directory Tiering.
 
+#### Most of the scripts have the assumption that you KNOW what you are doing, and some still have the hardcoded domain and ip information from my LAB.
+
 All servers needs to be created and joined to the Active Directory, that process is not part of this..
 
 Servers required, for all.  
