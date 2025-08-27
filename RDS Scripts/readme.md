@@ -1,4 +1,5 @@
-### The example scripts in this folder, will setup an Remote Desktop Session Host farm for accesing Management servers in Active Directory Tiering.
+## Setup Remote Desktop Session host farm(s)
+### The example scripts in this folder, will setup an Remote Access option for accesing On-Premis servers, can be used for internal and externals, just remember the security implications.
 
 #### Most of the scripts have the assumption that you KNOW what you are doing, and some still have the hardcoded domain and ip information from my LAB.
 
