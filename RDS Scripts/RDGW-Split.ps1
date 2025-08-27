@@ -85,11 +85,11 @@ if ($ServersQuery.count -ge 1) {
 # ------------------------------------------------------------
 $RDGWServers = @(    
     $T0RDGWServers | Foreach {
-        [PSCustomObject]@{ Name = $($_.name);  TargetPath = $T0TargetPath.DistinguishedName }        
+        [PSCustomObject]@{ Name = $($_.name);  TargetPath = $T0TargetPath.DistinguishedName }
     }
 
     $T1RDGWServers | Foreach {
-        [PSCustomObject]@{ Name = $($_.name);  TargetPath = $T1TargetPath.DistinguishedName }        
+        [PSCustomObject]@{ Name = $($_.name);  TargetPath = $T1TargetPath.DistinguishedName }
     }
 )
 
