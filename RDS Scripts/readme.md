@@ -8,24 +8,28 @@ All servers needs to be created and joined to the Active Directory, that process
 Servers required, for all.  
 RDLI-01 - Remote Desktop Licenseing server  
   
-Servers required, only for Tier 0  
-RDGW-001 - Remote Desktop Gateway and Entra Private Network Connector  
-RDGW-001 - Remote Desktop Gateway and Entra Private Network Connector  
-MGMT-001 - Management / Jump server Tier0  
-MGMT-002 - Management / Jump server Tier0  
+Servers required, in Tier 0  
+MGMT-01 - Management / Jump server Tier0  
+MGMT-02 - Management / Jump server Tier0  
   
-Servers required, only for Tier 1  
-RDDB-011 - SQL Server - Always on Cluster  
-RDDB-012 - SQL Server - Always on Cluster  
-RDCB-011 - Remote Desktop Connection broker  
-RDCB-011 - Remote Desktop Connection broker  
-RDGW-011 - Remote Desktop Gateway and Entra Private Network Connector  
-RDGW-011 - Remote Desktop Gateway and Entra Private Network Connector  
-MGMT-011 - Management / Jump server Tier1  
-MGMT-012 - Management / Jump server Tier1  
-MGMT-11L - Management / Jump server Tier1 Limited  
-MGMT-11L - Management / Jump server Tier1 Limited  
+Servers required, in Tier 1  
+RDDB-01 - SQL Server - Always on Cluster node  
+RDDB-02 - SQL Server - Always on Cluster node  
+RDCB-01 - Remote Desktop Connection broker  
+RDCB-02 - Remote Desktop Connection broker  
+RDGW-01 - Remote Desktop Gateway and Entra Private Network Connector  
+RDGW-02 - Remote Desktop Gateway and Entra Private Network Connector  
+MGMT-11 - Management / Jump server Tier1  
+MGMT-12 - Management / Jump server Tier1  
+MGMT-L1 - Management / Jump server Tier1 Limited  
+MGMT-L1 - Management / Jump server Tier1 Limited  
   
-If Tier2 is needed, a copy of Tier1 will be required, do NOT share across tiers.
+If Tier2 is needed.
+MGMT-21 - Management / Jump server Tier2  
+MGMT-22 - Management / Jump server Tier2  
+
+Servers required, in Tier Endpoint (Service Desk)
+MGMT-91 - Management / Jump server TierE  
+MGMT-92 - Management / Jump server TierE  
 
 Please use with causion, have been tested on server 2022 and 2025.
