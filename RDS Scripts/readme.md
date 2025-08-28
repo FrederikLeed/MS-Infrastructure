@@ -5,9 +5,6 @@
 
 All servers needs to be created and joined to the Active Directory, that process is not part of this..
 
-Servers required, for all.  
-RDLI-01 - Remote Desktop Licenseing server  
-  
 Servers required, in Tier 0  
 MGMT-01 - Management / Jump server Tier0  
 MGMT-02 - Management / Jump server Tier0  
@@ -19,6 +16,12 @@ RDCB-01 - Remote Desktop Connection broker
 RDCB-02 - Remote Desktop Connection broker  
 RDGW-01 - Remote Desktop Gateway and Entra Private Network Connector  
 RDGW-02 - Remote Desktop Gateway and Entra Private Network Connector  
+AMFA-01 - Radius service for MFA
+AMFA-02 - Radius service for MFA
+AAPC-01 - Azure Application Proxy Connector  
+AAPC-02 - Azure Application Proxy Connector  
+RDLI-01 - Remote Desktop Licenseing server  
+RDLI-02 - Remote Desktop Licenseing server  
 MGMT-11 - Management / Jump server Tier1  
 MGMT-12 - Management / Jump server Tier1  
 MGMT-L1 - Management / Jump server Tier1 Limited  
