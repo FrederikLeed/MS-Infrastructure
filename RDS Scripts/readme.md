@@ -5,11 +5,11 @@
 
 All servers needs to be created and joined to the Active Directory, that process is not part of this..
 
-Servers required, in Tier 0  
+Servers required in Tier 0  
 MGMT-01 - Management / Jump server Tier0  
 MGMT-02 - Management / Jump server Tier0  
   
-Servers required, in Tier 1  
+Servers required in Tier 1  
 RDDB-01 - SQL Server - Always on Cluster node  
 RDDB-02 - SQL Server - Always on Cluster node  
 RDCB-01 - Remote Desktop Connection broker  
@@ -31,7 +31,7 @@ If Tier2 is needed.
 MGMT-21 - Management / Jump server Tier2  
 MGMT-22 - Management / Jump server Tier2  
 
-Servers required, in Tier Endpoint (Service Desk)
+Servers required in Tier Endpoint (Service Desk)
 MGMT-91 - Management / Jump server TierE  
 MGMT-92 - Management / Jump server TierE  
 
