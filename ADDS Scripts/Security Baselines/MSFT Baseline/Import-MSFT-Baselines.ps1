@@ -10,6 +10,10 @@
         Date    : 01-02-2025
         - Updated with new regex to extract the download URLs after the release of Server 2025 Baselines.
 
+        Version : 2.1
+        Date    : 20-09-2025
+        - Added default import list, based on Server OS versions found in the Domain
+
 
     .DESCRIPTION
         Download and import selected security baselines from Microsoft Security Compliance Toolkit
@@ -42,19 +46,22 @@
     .EXAMPLE
         .\Import-MSFT-Baselines.ps1 -DownloadID 55319 -Path "C:\Windows\temp" -Action DownloadAndInstall -Cleanup
 
+    .EXAMPLE
+        .\Import-MSFT-Baselines.ps1 -DownloadID 55319 -Path "C:\Windows\temp" -Action AutoInstall -Cleanup
+
 #>
 # 
 # Request required script options.
 # 
 param (
     [Parameter(ValueFromPipeline)]
-    [string[]]$DownloadID=55319,
+    [string]$DownloadID=55319,
 
     [Parameter(ValueFromPipeline)]
-    $Path=$PSScriptRoot,
+    $Path="C:\Windows\Temp",
 
     [Parameter(ValueFromPipeline)]
-    [ValidateSet("Download","Install","DownloadAndInstall")]
+    [ValidateSet("Download","Install","DownloadAndInstall","AutoInstall")]
     $Action="DownloadAndInstall",
 
     [Parameter(ValueFromPipeline)]
@@ -154,26 +161,37 @@ if ($Action -ne "Download") {
             'Package' = $($GPO.FullName).Replace("$Path\","").Split("\\")[0]
             'Name' = $(([XML](Get-Content -Path "$($GPO.FullName)\backup.xml")).GroupPolicyBackupScheme.GroupPolicyObject.GroupPolicyCoreSettings.DisplayName.InnerText) -replace("SCM ","MSFT ")
         }
-
-    }
-    Write-Verbose "Show GPO list, please select which GPOs to import"
-    $Selected = $($GPOMap | Select-Object -Property "Name","Guid","Package" | Sort-Object -Descending -Property "Package" | Out-GridView -OutputMode Multiple -Title "Select Group Policy(s) to import")
-    if ($Selected.Length -eq 0) {
-        Write-Error "Please select which GPOs to import"
-        break
     }
 
+    if ($Action -eq "AutoInstall") {
+        # Find Server OS Versions in AD
+        $OSVersions = (Get-ADComputer -Filter "OperatingSystem -like '*Windows Server*'" -Properties OperatingSystem) | Select-Object -Property OperatingSystem -Unique
+
+        $Selected = $OSVersions | ForEach-Object { ($_.OperatingSystem -Split(" ") | Select-Object -SkipLast 1) -join(" ") } | ForEach-Object {
+            $OSVersion = $_ 
+            $GPOMap | Select-Object -Property "Name","Guid","Package" | Where {$_.name -like "*$OSVersion*"}
+        }
+
+
+    } else {
+        Write-Verbose "Show GPO list, please select which GPOs to import"
+        $Selected = $($GPOMap | Select-Object -Property "Name","Guid","Package" | Sort-Object -Descending -Property "Package" | Out-GridView -OutputMode Multiple -Title "Select Group Policy(s) to import")
+        if ($Selected.Length -eq 0) {
+            Write-Error "Please select which GPOs to import"
+            break
+        }
+    }
 
     # Import selected GPOs 
     # ------------------------------------------------------------
     Foreach ($GPO in $Selected) {
         $GpoPath = (Get-ChildItem -Path $Path -Recurse | Where {$_.Name -eq $($GPO.Guid)}).Parent
-        Write-Verbose "Import GPO : `"$($GPO.Name)`""
+        Write-Output "Import GPO : `"$($GPO.Name)`""
         try {
             Import-GPO -BackupId $GPO.Guid -Path $GpoPath.FullName -TargetName "$($GPO.Name)" -CreateIfNeeded | Out-Null
         } catch {
             Write-Output "Unable to import GPO, please verify that you user have the required permissions"
-            Write-Output $_
+            Write-Output $GpoPath.FullName
         }
     }
 
