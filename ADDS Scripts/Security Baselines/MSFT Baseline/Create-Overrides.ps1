@@ -6,12 +6,9 @@
 
 # Get all MSFT GPOs, and create Override GPO with link enabled Before the Baseline.
 # ------------------------------------------------------------
-$RefGpos = (Get-GPO -All | Where {$_.DisplayName -like "*MSFT*Member Server"})
+$RefGpos = Get-GPO -All | Where {$_.DisplayName -like "*MSFT*Member Server"}
 foreach ($RefGpo in $RefGpos) {
-    try {
-        $GPO = Get-GPO -Name "$($RefGpo.DisplayName) [Overrides]"
-    }
-    Catch {
+    if (!($RefGpos | where {$_.DisplayName -eq "$($RefGpo.DisplayName) [Overrides]"})) {
 
         $GPO = New-GPO -Name "$($RefGpo.DisplayName) [Overrides]"
         Set-GPRegistryValue -Name $GPO.DisplayName -Key "HKLM\SOFTWARE\Policies\Microsoft\Windows NT\Terminal Services" -ValueName "fPromptForPassword" -Value 0 -Type DWord | Out-Null
