@@ -65,6 +65,9 @@ param (
     $Action="DownloadAndInstall",
 
     [Parameter(ValueFromPipeline)]
+    [object]$OSVersions=@("2022","2025"),
+
+    [Parameter(ValueFromPipeline)]
     [switch]$Cleanup
 
 )
@@ -164,10 +167,15 @@ if ($Action -ne "Download") {
     }
 
     if ($Action -eq "AutoInstall") {
-        # Find Server OS Versions in AD
-        $OSVersions = (Get-ADComputer -Filter "OperatingSystem -like '*Windows Server*'" -Properties OperatingSystem) | Select-Object -Property OperatingSystem -Unique
+        if (-not ($OSVersions)) {
+            # Find Server OS Versions in AD
+            $OSVersions = Get-ADComputer -Filter "OperatingSystem -like '*Windows Server*'" -Properties OperatingSystem | `
+                            Select-Object -ExpandProperty OperatingSystem -Unique | `
+                            Where-Object { $_ -match '^(?:\D+)(\d{4})(?:\D+)$' } | `
+                            ForEach-Object { [INT]$Matches[1] }
+        }
 
-        $Selected = $OSVersions | ForEach-Object { ($_.OperatingSystem -Split(" ") | Select-Object -SkipLast 1) -join(" ") } | ForEach-Object {
+        $Selected = $OSVersions | ForEach-Object {
             $OSVersion = $_ 
             $GPOMap | Select-Object -Property "Name","Guid","Package" | Where {$_.name -like "*$OSVersion*"}
         }
