@@ -208,7 +208,7 @@ if ($Action -ne "Download") {
 
 # Cleanup
 # ------------------------------------------------------------
-if ( ($Action -ne "Download") -and ($Cleanup -eq "Yes") ) {
+if ( ($Action -ne "Download") -and ($Cleanup) ) {
     Write-Verbose "Cleanup policy folders"
     Get-ChildItem -Path $Path -Directory | Remove-Item -Recurse -Force
 }
